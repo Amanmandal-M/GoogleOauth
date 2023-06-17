@@ -38,7 +38,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: process.env.URL,
+      callbackURL: process.env.CLIENT_URL,
     },
     (accessToken, refreshToken, profile, done) => {
       // Custom logic to handle user profile after authentication
