@@ -18,6 +18,11 @@ app.use(express.json());
 // Middleware to enable Cross-Origin Resource Sharing
 app.use(cors());
 
+// Default Response
+app.get('/',(req,res)=>{
+  res.send(`<h1 style="color:blue;text-align:center">Welcome to Google Oauth Backend</h1>`)
+});
+
 // Route middleware for Google OAuth
 app.use("/", googleOauth);
 
