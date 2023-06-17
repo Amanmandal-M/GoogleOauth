@@ -9,6 +9,7 @@ const { userModel } = require("../models/authModel");
 
 require("dotenv").config();
 
+// Configure session middleware for Express
 googleOauth.use(
   session({
     secret: process.env.SESSION_KEY,
@@ -16,6 +17,8 @@ googleOauth.use(
     saveUninitialized: false,
   })
 );
+
+// Initialize Passport and restore authentication state from session
 googleOauth.use(passport.initialize());
 googleOauth.use(passport.session());
 
@@ -39,20 +42,24 @@ passport.use(
     },
     (accessToken, refreshToken, profile, done) => {
       // Custom logic to handle user profile after authentication
-      // saving user details in a database
+      // Save user details in a database
       saveDataOfUser({ profile });
       done(null, profile);
     }
   )
 );
 
+// Function to save user data to the database
 async function saveDataOfUser({
   profile: { id, displayName, emails, photos },
 }) {
   try {
+    // Check if the user already exists in the database
     const isPresent = await userModel.aggregate([{ $match: { emails } }]);
-    if (isPresent.length < 0) console.log(isPresent);
-    else {
+    if (isPresent.length < 0) {
+      console.log(isPresent);
+    } else {
+      // Create a new user document and save it to the database
       const data = new userModel({
         GoogleId: id,
         Name: displayName,
@@ -67,12 +74,15 @@ async function saveDataOfUser({
   }
 }
 
-// Set up routes
+// Set up routes for Google OAuth
+
+// Redirect users to Google's authentication page
 googleOauth.get(
   "/auth/google",
   passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
+// Callback URL after successful authentication
 googleOauth.get(
   "/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/login" }),
@@ -82,7 +92,7 @@ googleOauth.get(
     res
       .status(200)
       .json(
-        "Email is Verified ... This is for Checking Only ... If this is coming her it means all the thing is working fine"
+        "Email is Verified ... This is for Checking Only ... If this is coming here it means all the things are working fine"
       );
   }
 );

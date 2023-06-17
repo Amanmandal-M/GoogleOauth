@@ -12,14 +12,21 @@ const { dbConnection } = require("./configs/authDb");
 
 const PORT = process.env.PORT || 8080;
 
+// Middleware to parse JSON request bodies
 app.use(express.json());
+
+// Middleware to enable Cross-Origin Resource Sharing
 app.use(cors());
 
+// Route middleware for Google OAuth
 app.use("/", googleOauth);
 
+// Start the server and connect to the database
 app.listen(PORT, async () => {
   try {
     console.log(colors.bgBlue.white(`Server is listening at PORT ${PORT}`));
+
+    // Connect to the database
     await dbConnection;
     console.log(
       colors.bgBlue.white(
