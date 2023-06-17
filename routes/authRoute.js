@@ -50,14 +50,18 @@ async function saveDataOfUser({
   profile: { id, displayName, emails, photos },
 }) {
   try {
-    const data = new userModel({
-      GoogleId: id,
-      Name: displayName,
-      Email: emails[0].value,
-      ProfileUrl: photos[0].value,
-      isVerifiedEmail: emails[0].verified,
-    });
-    await data.save();
+    const isPresent = await userModel.aggregate([{ $match: { emails } }]);
+    if (isPresent.length < 0) console.log(isPresent);
+    else {
+      const data = new userModel({
+        GoogleId: id,
+        Name: displayName,
+        Email: emails[0].value,
+        ProfileUrl: photos[0].value,
+        isVerifiedEmail: emails[0].verified,
+      });
+      await data.save();
+    }
   } catch (error) {
     console.log(colors.bgRed.black(`Error in Database : ${error.message}`));
   }
@@ -75,7 +79,11 @@ googleOauth.get(
   async (req, res) => {
     // Redirect user after successful authentication
     const data = await userModel.find();
-    res.status(200).json();
+    res
+      .status(200)
+      .json(
+        "Email is Verified ... This is for Checking Only ... If this is coming her it means all the thing is working fine"
+      );
   }
 );
 
